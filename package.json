@@ -9,9 +9,24 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.91.1",
+    "@auth/prisma-adapter": "^2.11.2",
+    "@prisma/client": "^7.8.0",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
+    "@supabase/supabase-js": "^2.104.1",
+    "cloudinary": "^2.10.0",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.38.0",
     "next": "16.2.4",
+    "next-auth": "^4.24.14",
+    "next-cloudinary": "^6.17.5",
+    "prisma": "^7.8.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hot-toast": "^2.6.0",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
