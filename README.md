@@ -1,41 +1,36 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NEXUS — Social Community Platform
 
-## Getting Started
+> A full-stack social community platform with real-time features, AI assistant, and beautiful dark UI.
 
-First, run the development server:
+## 🚀 Live Demo
+[nexus-social-app.vercel.app](https://nexus-social-app.vercel.app)
 
+## ✨ Features
+- 🔐 OAuth Authentication (GitHub + Google)
+- 📰 Real-time Feed with likes, saves, polls
+- 🌐 Interest-based Communities
+- 💬 Direct Messaging with chat UI
+- 👤 User Profiles with stats & analytics
+- 🤖 AI Assistant (Claude API)
+- 📱 Fully Responsive Design
+
+## 🛠 Tech Stack
+| Frontend | Backend | Database | Tools |
+|---|---|---|---|
+| Next.js 14 | Next.js API Routes | PostgreSQL | Prisma ORM |
+| TypeScript | NextAuth.js | Supabase | Framer Motion |
+| Tailwind CSS | Node.js | Redis | Cloudinary |
+
+## 🏃 Run Locally
 ```bash
+git clone https://github.com/YOUR_USERNAME/nexus-social-app.git
+cd nexus-social-app
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📸 Screenshots
+Login · Feed · Communities · Messages · Profile
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# nexus-social-app
-A full-stack social community platform with real-time features and AI
->>>>>>> e72deef43844439a35ef53e311bff4d23bd84988
+## 👨‍💻 Author
+Built by Yash Chavan — https://www.linkedin.com/in/yash-chavan-b42905292/
