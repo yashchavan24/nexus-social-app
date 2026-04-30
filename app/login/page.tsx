@@ -1,4 +1,5 @@
  'use client'
+ import { signIn } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 
@@ -38,16 +39,22 @@ export default function LoginPage() {
           </div>
 
           {/* OAuth buttons */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
-            {['⬛ GitHub', '🔵 Google'].map(btn => (
-              <motion.button key={btn}
-                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                style={{ padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#e5e7eb', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}
-              >
-                {btn}
-              </motion.button>
-            ))}
-          </div>
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
+  <motion.button
+    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+    onClick={() => signIn('github', { callbackUrl: '/feed' })}
+    style={{ padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#e5e7eb', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}
+  >
+    ⬛ GitHub
+  </motion.button>
+  <motion.button
+    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+    onClick={() => signIn('google', { callbackUrl: '/feed' })}
+    style={{ padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#e5e7eb', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}
+  >
+    🔵 Google
+  </motion.button>
+</div>
 
           {/* Divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
