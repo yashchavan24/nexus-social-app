@@ -1,6 +1,6 @@
 'use client'
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 
 const userPosts = [
@@ -14,6 +14,9 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('posts')
   const [likedPosts, setLikedPosts] = useState<number[]>([])
   const [isEditing, setIsEditing] = useState(false)
+  const [showNamePrompt, setShowNamePrompt] = useState(false)
+  const [tempName, setTempName] = useState('')
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [profile, setProfile] = useState({
     name: '',
     bio: 'Full-stack developer · Building cool things 🚀',
@@ -21,15 +24,84 @@ export default function ProfilePage() {
     website: 'github.com',
     role: 'Software Engineer',
   })
+  const [editDraft, setEditDraft] = useState(profile)
 
-  const userName = session?.user?.name || profile.name || 'User'
+  const sessionName = session?.user?.name || ''
   const userEmail = session?.user?.email || ''
   const userImage = session?.user?.image || null
+  const userName = profile.name || sessionName || 'User'
   const userHandle = userEmail.split('@')[0] || 'user'
   const userInitial = userName.charAt(0).toUpperCase()
 
+  useEffect(() => {
+    const savedName = localStorage.getItem('nexus_display_name')
+    const savedImage = localStorage.getItem('nexus_avatar')
+    if (savedName) setProfile(prev => ({ ...prev, name: savedName }))
+    if (savedImage) setPreviewImage(savedImage)
+    if (!savedName && !sessionName) setShowNamePrompt(true)
+  }, [sessionName])
+
+  const saveNamePrompt = () => {
+    if (tempName.trim()) {
+      setProfile(prev => ({ ...prev, name: tempName.trim() }))
+      localStorage.setItem('nexus_display_name', tempName.trim())
+      setShowNamePrompt(false)
+    }
+  }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result as string
+        setPreviewImage(result)
+        localStorage.setItem('nexus_avatar', result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const openEdit = () => {
+    setEditDraft(profile)
+    setIsEditing(true)
+  }
+
+  const saveEdit = () => {
+    setProfile(editDraft)
+    if (editDraft.name) localStorage.setItem('nexus_display_name', editDraft.name)
+    setIsEditing(false)
+  }
+
+  const avatarSrc = previewImage || userImage || ''
+
   return (
     <div style={{ minHeight: '100vh', background: '#09090f', color: '#f1f0ff' }}>
+
+      {/* Name Prompt Modal */}
+      {showNamePrompt && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+            style={{ background: '#111118', border: '1px solid rgba(124,106,255,0.4)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ fontSize: '40px', marginBottom: '12px' }}>👋</div>
+            <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '8px' }}>Welcome to NEXUS!</h2>
+            <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '24px' }}>What should we call you?</p>
+            <input
+              value={tempName}
+              onChange={e => setTempName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && saveNamePrompt()}
+              placeholder="Enter your display name..."
+              autoFocus
+              style={{ width: '100%', background: '#1a1a24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: '#f1f0ff', outline: 'none', boxSizing: 'border-box', marginBottom: '16px' }}
+            />
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+              onClick={saveNamePrompt}
+              style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'linear-gradient(135deg, #7c6aff, #6366f1)', border: 'none', color: 'white', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+              Let's go →
+            </motion.button>
+          </motion.div>
+        </div>
+      )}
 
       {/* Navbar */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(9,9,15,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: '0 24px', display: 'flex', alignItems: 'center', height: '56px', gap: '24px' }}>
@@ -54,15 +126,15 @@ export default function ProfilePage() {
               style={{ background: '#111118', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '480px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px' }}>Edit Profile</h2>
               {[
-                { label: 'Display Name', key: 'name', placeholder: userName, value: profile.name },
-                { label: 'Bio', key: 'bio', placeholder: 'Tell people about yourself', value: profile.bio },
-                { label: 'Location', key: 'location', placeholder: 'Where are you based?', value: profile.location },
-                { label: 'Website', key: 'website', placeholder: 'yourwebsite.com', value: profile.website },
-                { label: 'Role', key: 'role', placeholder: 'Your job title', value: profile.role },
+                { label: 'Display Name', key: 'name', placeholder: 'Your name', value: editDraft.name },
+                { label: 'Bio', key: 'bio', placeholder: 'Tell people about yourself', value: editDraft.bio },
+                { label: 'Location', key: 'location', placeholder: 'Where are you based?', value: editDraft.location },
+                { label: 'Website', key: 'website', placeholder: 'yourwebsite.com', value: editDraft.website },
+                { label: 'Role', key: 'role', placeholder: 'Your job title', value: editDraft.role },
               ].map(field => (
                 <div key={field.key} style={{ marginBottom: '14px' }}>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>{field.label}</label>
-                  <input value={field.value} onChange={e => setProfile(prev => ({ ...prev, [field.key]: e.target.value }))}
+                  <input value={field.value} onChange={e => setEditDraft(prev => ({ ...prev, [field.key]: e.target.value }))}
                     placeholder={field.placeholder}
                     style={{ width: '100%', background: '#1a1a24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 14px', fontSize: '14px', color: '#f1f0ff', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
@@ -73,7 +145,7 @@ export default function ProfilePage() {
                   Cancel
                 </button>
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                  onClick={() => setIsEditing(false)}
+                  onClick={saveEdit}
                   style={{ flex: 1, padding: '10px', borderRadius: '10px', background: 'linear-gradient(135deg, #7c6aff, #6366f1)', border: 'none', color: 'white', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
                   Save Changes ✓
                 </motion.button>
@@ -84,41 +156,37 @@ export default function ProfilePage() {
 
         {/* Profile card */}
         <div style={{ background: '#111118', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', overflow: 'hidden', marginBottom: '16px' }}>
-
-          {/* Banner */}
           <div style={{ height: '140px', background: 'linear-gradient(135deg, #312e81, #1e3a5f, #064e3b)', position: 'relative' }}>
             <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(124,106,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(56,189,248,0.2) 0%, transparent 50%)' }} />
           </div>
-
-          {/* Avatar + info */}
           <div style={{ padding: '0 24px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ position: 'relative', marginTop: '-40px' }}>
-                {userImage ? (
-                  <img src={userImage} alt={userName}
+              <div style={{ position: 'relative', marginTop: '-40px', cursor: 'pointer' }}
+                onClick={() => document.getElementById('avatar-upload')?.click()}>
+                {avatarSrc ? (
+                  <img src={avatarSrc} alt={userName}
                     style={{ width: '80px', height: '80px', borderRadius: '50%', border: '4px solid #09090f', objectFit: 'cover' }} />
                 ) : (
                   <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c6aff, #38bdf8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 900, border: '4px solid #09090f' }}>
                     {userInitial}
                   </div>
                 )}
-                <div style={{ position: 'absolute', bottom: '4px', right: '4px', width: '16px', height: '16px', borderRadius: '50%', background: '#34d399', border: '2px solid #09090f' }} />
+                <div style={{ position: 'absolute', bottom: '0', right: '0', width: '24px', height: '24px', borderRadius: '50%', background: '#7c6aff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', border: '2px solid #09090f' }}>📷</div>
+                <input id="avatar-upload" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
               </div>
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                onClick={() => setIsEditing(true)}
+                onClick={openEdit}
                 style={{ padding: '8px 20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: '#f1f0ff', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
                 ✎ Edit Profile
               </motion.button>
             </div>
-
             <h2 style={{ fontSize: '22px', fontWeight: 900, margin: '0 0 4px' }}>
-              {profile.name || userName} <span style={{ color: '#a78bfa', fontSize: '18px' }}>✦</span>
+              {userName} <span style={{ color: '#a78bfa', fontSize: '18px' }}>✦</span>
             </h2>
             <p style={{ color: '#6b7280', fontSize: '14px', margin: '0 0 8px' }}>
               @{userHandle} · <span style={{ color: '#34d399' }}>● Online</span>
             </p>
             <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: 1.6, margin: '0 0 14px' }}>{profile.bio}</p>
-
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '13px', color: '#9ca3af' }}>🏢 {profile.role}</span>
               <span style={{ fontSize: '13px', color: '#9ca3af' }}>📍 {profile.location}</span>
@@ -148,20 +216,19 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Posts tab */}
         {activeTab === 'posts' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {userPosts.map((post, i) => (
               <motion.div key={post.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
                 style={{ background: '#111118', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '16px' }}>
                 <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                  {userImage ? (
-                    <img src={userImage} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  {avatarSrc ? (
+                    <img src={avatarSrc} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   ) : (
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c6aff, #38bdf8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>{userInitial}</div>
                   )}
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: '14px' }}>{profile.name || userName} <span style={{ color: '#a78bfa' }}>✦</span></div>
+                    <div style={{ fontWeight: 600, fontSize: '14px' }}>{userName} <span style={{ color: '#a78bfa' }}>✦</span></div>
                     <div style={{ fontSize: '12px', color: '#6b7280' }}>@{userHandle} · {post.time}</div>
                   </div>
                 </div>
