@@ -215,7 +215,7 @@ export default function FeedPage() {
         <aside>
           <div style={{ background: '#111118', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
             <p style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#6b7280', marginBottom: '12px' }}>Navigate</p>
-            {[{ icon: '🏠', label: 'Home Feed', href: '/feed', active: true }, { icon: '🌐', label: 'Communities', href: '/communities' }, { icon: '💬', label: 'Messages', href: '/messages' }, { icon: '🔖', label: 'Saved', href: '#' }, { icon: '📈', label: 'Analytics', href: '#' }].map(item => (
+            {[{ icon: '🏠', label: 'Home Feed', href: '/feed', active: true }, { icon: '🌐', label: 'Communities', href: '/communities' }, { icon: '💬', label: 'Messages', href: '/messages' }, { icon: '🔖', label: 'Saved', href: '/saved' }, { icon: '📈', label: 'Analytics', href: '/analytics' }].map(item => (
               <a key={item.label} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 10px', borderRadius: '10px', marginBottom: '2px', background: item.active ? 'rgba(124,106,255,0.12)' : 'none', color: item.active ? '#a78bfa' : '#9ca3af', fontSize: '14px', textDecoration: 'none' }}>
                 <span style={{ width: '28px', height: '28px', background: '#1a1a24', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
                 {item.label}
